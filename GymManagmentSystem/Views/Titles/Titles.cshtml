@@ -1,0 +1,155 @@
+﻿@model List<Models.Title>
+@{
+    ViewBag.Title = "Titles";
+}
+
+<h2>Titles</h2>
+
+<html>
+<head>
+    
+    <style>
+        .btn {
+            background-color: DodgerBlue;
+            border: none;
+            color: white;
+            padding: 2px 6px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+    <script>
+        function DeleteRecord(id) {
+            $.ajax({
+                type: "post",
+                url: "/Titles/Delete",
+                data: { id: id },
+                success: function (data) {
+                    location.reload();
+                },
+                error: function (data) {
+                    alert("Failed to delete");
+                }
+            });
+        };
+        function UpdateRecord(id, name) {
+            var n = name.split(" ");
+            lStr = n[n.length - 1];
+
+            document.getElementById("btnSaveUpdate").value = "Update";
+            if (lStr.toLowerCase() == "trainer") {
+                document.getElementById("cbIsSport").checked = true;
+            } else {
+                document.getElementById("cbIsSport").checked = false;
+            }            
+            document.getElementById("nameTitle").value = name;
+            document.getElementById("idArea").style.visibility = "visible";
+            document.getElementById("innerId").innerHTML = id;
+        }
+        function saveUpdateClick(operation) {
+            var name = document.getElementById("nameTitle").value;
+            if (operation == "Update") {
+                var id = document.getElementById("innerId").innerHTML;
+                $.ajax({
+                    type: "post",
+                    url: "/Titles/Update",
+                    data: { id: id, name: name },
+                    success: function () {
+                        location.reload();
+                    },
+                    error: function () {
+                        alert("Faild to update");
+                    }
+                });
+            } else {
+                var titlePos = document.getElementById("cbIsSport").checked;
+                $.ajax({
+                    type: "post",
+                    url: "/Titles/Insert",
+                    data: { name: name, isSport: titlePos },
+                    success: function () {
+                        location.reload();
+                    },
+                    error: function () {
+                        alert("Faild to update");
+                    }
+                });
+            }
+        }
+    </script>
+    <style>
+        table {
+            background: url('../../background Images/titlesTableBG.png');
+            background-size: 100% 100%;
+        }
+
+        td {
+            margin-left: 5px;
+        }
+
+        tr {
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div>
+            <h2 class="text-center mb-3 text-secondary bg-light rounded-lg py-3">Titles</h2>
+        </div>
+        <table class="table">
+            <thead class="thead thead-title">
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Added by</th>
+                    <th scope="col">Added Date</th>
+                    <th scope="col">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="tbody-title">
+                @{int count = 1;} 
+                @foreach (var item in Model)
+                {
+                <tr>
+                    <th scope="row">@count</th>
+                    <td>@item.Name</td>
+                    <td>@item.AddedBy</td>
+                    <td>@item.AddedOn</td>
+                    <td class="table-actions">
+                        <div class="actions">
+                            <i name="imgbtnEditName" id="imgbtnEditId" onclick="UpdateRecord(@item.ID,'@item.Name')" class="far fa-edit"></i>
+                            <i name="imgbtnDeleteName" id="imgbtnDeleteName" onclick="DeleteRecord(@item.ID)" class="fas fa-ban"></i>
+                        </div>
+                    </td>
+                </tr>
+                }
+                    
+                </tbody>
+        </table>
+        <!-- add title form -->
+        <div class="container">
+            <form class="form-inline">
+                <label for="inlineFormTitle" class="m-2">Title</label>
+
+                @* <div class="col-md-3">
+            <input type="submit" id="btnSaveUpdate" onclick="saveUpdateClick(this.value)" value="Save" style="width:150px;" />
+        </div> *@
+
+                <input type="text" name="txtTitle" class="form-control m-2" id="nameTitle">
+                <span id="idArea" style="visibility:hidden">id:</span> <span id="innerId"></span>
+                <div class="form-check m-2 mx-5">
+                    <input class="form-check-input" type="checkbox" id="cbIsSport" value="Is Sport">
+                    <label class="form-check-label" for="cbIsSport">Is Sport</label>
+                </div>
+                <input type="submit" class="btn btn-title m-2" id="btnSaveUpdate" onclick="saveUpdateClick(this.value)" value="Save"/>
+            </form>
+        </div>
+    </div>
+
+
+
+    <script src="js/jquery.slim.min.js"></script>
+    <script src="js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

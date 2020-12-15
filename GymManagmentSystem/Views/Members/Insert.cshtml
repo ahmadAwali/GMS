@@ -1,0 +1,304 @@
+﻿
+@{
+    ViewBag.Title = "Insert";
+}
+
+<html>
+<head>
+    <title>
+        INSERT MEMBER
+    </title>
+    <script>
+        $(document).ready(function () {
+            $.ajax({
+                url: '/Members/GetClasses',
+                method: 'get',
+                data: {},
+                success: function (data) {
+                    
+                    $("#ddlClasses").append("<option value='0'> --Select Sport-- </option>");
+                    for (var index in data) {
+                        $("#ddlClasses").append("<option value='" + data[index].Id + "'>" + data[index].Name
+                            + ' / ' + data[index].Trainer + ' / ' + data[index].DayTime + "</option>");
+                    }
+                },
+                error: function (error) {
+                    debugger;
+                }
+            });
+
+            if (document.getElementById("pageStatus").innerHTML == "Update") {
+                prepareToUpdate(@ViewBag.id);
+                document.getElementById("btnSave").value = "Update";
+            }
+        });
+
+        function prepareToUpdate(Id) {
+            $.ajax({
+                method: "get",
+                url: "/Members/GetMember",
+                data: {
+                    memId: Id
+                },
+                success: function (data) {
+                    alert("done");
+                    FillAllFields(data)
+                },
+                error: function () {
+                    alert("failed to get data");
+                }
+            });
+        }
+
+        function setStarted() {
+            var visable = document.getElementById("cbStarted").checked;
+            document.getElementById("starting").hidden = visable;
+
+        }
+
+        function fileSelectedPersonal(input) {
+            /**/
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+
+                reader.onload = function (e) {
+                    $('#imgPersonal')
+                        .attr('src', e.target.result)
+                        .width(200)
+                        .height(200);
+                };
+
+                reader.readAsDataURL(input.files[0]);
+            }
+            /**/
+        }
+
+        function fileSelectedId(input) {
+            /**/
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+
+                reader.onload = function (e) {
+                    $('#imgId')
+                        .attr('src', e.target.result)
+                        .width(200)
+                        .height(200);
+                };
+
+                reader.readAsDataURL(input.files[0]);
+            }
+            /**/
+        }
+
+        function FillAllFields(data) {
+            document.getElementById("txtFirstName").value = data.Name1;
+            document.getElementById("txtSecondName").value = data.Name2;
+            document.getElementById("txtThirdName").value = data.Name3;
+            document.getElementById("txtFourthName").value = data.Name4;
+            document.getElementById("ddlGender").value = data.Gender;
+            document.getElementById("txtNationalId").value = data.NationalID;
+            document.getElementById("imgPersonal").src = "data:image/png;base64," + data.Image;
+            document.getElementById("imgId").src = "data:image/png;base64," + data.IdentityImage;
+            document.getElementById("ddlMartialState").value = data.MartialState;
+            document.getElementById("txtAddress").value = data.Address;
+            document.getElementById("txtPhoneNumber1").value = data.PhoneNo1;
+            document.getElementById("txtPhoneNumber2").value = data.PhoneNo2;
+            document.getElementById("txtEmail").value = data.Email;
+            document.getElementById("ddlClasses").value = data.classes;
+
+            //Birth Date begin
+            var strDate = data.BirthDate;
+            var date = data.BirthDate.substring(0, strDate.indexOf(" "));
+            var lisDate = date.split("/");
+            var day = lisDate[0];;
+            var mounth = lisDate[1];
+            if (lisDate[0].length == 1)
+                day = "0" + lisDate[0];
+            if (lisDate[1].length == 1)
+                mounth = "0" + lisDate[1];
+            var validDate = lisDate[2] + "-" + day + "-" + mounth;
+            document.getElementById("txtBirthDate").value = validDate;
+            //Birth Date end
+
+            //membership Date begin
+            var str2Date = data.membershipDate;
+            var date2 = data.BirthDate.substring(0, str2Date.indexOf(" "));
+            var lisDate2 = date2.split("/");
+            var day2 = lisDate2[0];;
+            var mounth2 = lisDate2[1];
+            if (lisDate2[0].length == 1)
+                day2 = "0" + lisDate2[0];
+            if (lisDate2[1].length == 1)
+                mounth2 = "0" + lisDate2[1];
+            var validDate2 = lisDate2[2] + "-" + day2 + "-" + mounth2;
+            document.getElementById("txtMemberShipExpired").value = validDate2;
+            //membership Date end
+
+
+            FillSelectUpdate(data.IsTrainer, data.TitleID);
+            document.getElementById("txtSalary").value = data.Salary;
+        }
+
+    </script>
+    <style>
+        .row {
+            padding-bottom: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container my-4">
+        <div>
+            @if (@ViewBag.id == null)
+            {
+                <div class="emp-heading text-center mb-4  bg-light rounded-lg py-4">
+                    <h2 class="text-secondary" id="pageStatus">Insert</h2>
+                    <span span class="text-secondary"> Member</span>
+                </div>
+
+            }
+            else
+            {
+                <div class="text-center mb-4  bg-light rounded-lg py-4">
+                    <h2 class="text-secondary" id="pageStatus">Update</h2>
+                    <span span class="text-secondary"> Member</span>
+                </div>
+
+            }
+
+        </div>
+        @using (Html.BeginForm("Save", "Members", new { empId = @ViewBag.id }, FormMethod.Post,
+            new { enctype = "multipart/form-data", @class = "form-horizontal emp-form" }))
+        {
+            <div class="form-group row ">
+                <label for="txtFirstName" class="col-sm-4 control-label">Name:</label>
+                <div class="col-sm-8">
+                    <input type="text" name="txtFirstName" id="txtFirstName" placeholder="First Name" class="form-control" autofocus>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label for="txtSecondName" class="col-sm-4 control-label">Father Name:</label>
+                <div class="col-sm-8">
+                    <input type="text" name="txtSecondName" id="txtSecondName" placeholder="Second Name" class="form-control" autofocus>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label for="txtThirdName" class="col-sm-4 control-label">GrandFather Name:</label>
+                <div class="col-sm-8">
+                    <input type="text" name="txtThirdName" id="txtThirdName" placeholder="Last Name" class="form-control" autofocus>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label for="txtFourthName" class="col-sm-4 control-label">Family Name:</label>
+                <div class="col-sm-8">
+                    <input type="text" name="txtFourthName" id="txtFourthName" placeholder="Last Name" class="form-control" autofocus>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label for="gender" class="col-sm-4 control-label">Gender</label>
+                <div class="col-sm-8">
+                    <select class="form-control" name="ddlGender" id="ddlGender">
+                        <option value="none" selected>--select--</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label for="nationalID" class="col-sm-4 control-label">National ID</label>
+                <div class="col-sm-8">
+                    <input type="text" name="txtNationalId" id="txtNationalId" placeholder="National ID" class="form-control" autofocus>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label for="personalImage" class="col-sm-4 control-label">Personal Image</label>
+                <div class="col-sm-8">
+                    <input type="file" id="personImage" name="personImage" onchange="fileSelectedPersonal(this)" class="form-control-file">
+                    <img id="imgPersonal" class="img-fluid image-form" src="~/Images/defaultImg.png" />
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label for="personalImage" class="col-sm-4 control-label">ID Image</label>
+                <div class="col-sm-8">
+                    <input type="file" id="idImage" name="idImage" onchange="fileSelectedId(this)" class="form-control-file">
+                    <img id="imgId" class="img-fluid id-image" src="~/Images/defaultImg.png" />
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label for="birthDate" class="col-sm-4 control-label">Birth date</label>
+                <div class="col-sm-8">
+                    <input type="date" id="txtBirthDate" name="txtBirthDate" class="form-control">
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label for="ddlMartialState" class="col-sm-4 control-label">Martial State:</label>
+                <div class="col-sm-8">
+                    <select class="form-control" name="ddlMartialState" id="ddlMartialState">
+                        <option value="none" selected>--select--</option>
+                        <option value="Single">Single</option>
+                        <option value="Married">Married</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label for="address" class="col-sm-4 control-label">Address</label>
+                <div class="col-sm-8">
+                    <input type="text" id="txtAddress" name="txtAddress" placeholder="Address" class="form-control" autofocus>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label for="txtPhoneNumber1" class="col-sm-4 control-label">First Phone number </label>
+                <div class="col-sm-8">
+                    <input type="text" name="txtPhoneNumber1" id="txtPhoneNumber1" placeholder="+9627........" class="form-control">
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label for="txtPhoneNumber2" class="col-sm-4 control-label">Second Phone number </label>
+                <div class="col-sm-8">
+                    <input type="text" name="txtPhoneNumber2" id="txtPhoneNumber2" placeholder="+9627........" class="form-control">
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label for="txtEmail" class="col-sm-4 control-label">Email* </label>
+                <div class="col-sm-8">
+                    <input type="email" name="txtEmail" id="txtEmail" placeholder="user@domain.com" class="form-control">
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label for="ddlClasses" class="col-sm-4 control-label">Classes:</label>
+                <div class="col-sm-8">
+                    <select class="form-control" name="ddlClasses" id="ddlClasses">
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label for="txtMemberShipExpired" class="col-sm-4 control-label">Membership Expired</label>
+                <div class="col-sm-8">
+                    <input type="date" id="txtMemberShipExpired" name="txtMemberShipExpired" class="form-control">
+                </div>
+            </div>
+
+            <div class="button my-2">
+                <input type="submit" class="btn btn-form " name="btnSave" id="btnSave" value="Save">
+            </div>
+        }
+    </div>
+</body>
+
+</html>

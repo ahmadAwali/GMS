@@ -1,0 +1,324 @@
+﻿@model GymManagmentSystem.Models.ClassModels.ClassModel
+@if (ViewBag.id == null)
+{
+    <h2 id="pageStatus">Insert</h2>
+}
+else
+{
+    <h2 id="pageStatus">Update</h2>
+}
+
+<html>
+<head>
+    <script>
+        var Times = [
+            "08:00-09:30 am",
+            "09:30-11:00 am",
+            "11:00-12:30 pm",
+            "12:30-02:00 pm",
+            "02:00-03:30 pm",
+            "03:30-05:00 pm",
+            "05:00-06:30 pm",
+            "06:30-08:00 pm"
+        ];
+
+
+
+        $(document).ready(function () {
+            $.ajax({
+                method: 'get',
+                url: '/Classes/GetSports',
+                data: {},
+                success: function (data) {
+                    FillSports(data);
+                },
+                error: function () {
+                    debugger;
+                }
+            });
+
+            if (document.getElementById("pageStatus").innerHTML == "Update") {
+                PrepareToUpdate(@ViewBag.id);
+            } else {
+
+            }
+        });
+
+        function PrepareToUpdate(id) {
+            $.ajax({
+                method: 'get',
+                url: '/Classes/GetClass',
+                data: { sportId: id },
+                success: function (data) {
+                    FillAllFialds(data);
+                },
+                error: function () {
+
+                }
+            });
+
+        }
+
+        function ChangeLimitation(checkBox) {
+            var cb = checkBox.checked;
+            var start = document.getElementById("StartDate");
+            var end = document.getElementById("EndDate");
+            if (cb) {
+                start.removeAttribute("hidden");
+                end.removeAttribute("hidden");
+            } else {
+                start.setAttribute("hidden", true);
+                end.setAttribute("hidden", true);
+            }
+        }
+
+        function FillSports(data) {
+            $("#sSports").append("<option value='0'> --Select Sport-- </option>");
+            for (var index in data) {
+                $("#sSports").append("<option value='" + data[index].Id + "'>" + data[index].Name + "</option>");
+            }
+        }
+
+        function FillTrainersSelect(data) {
+            $('#sTrainers').find('option').remove().end();
+            $("#sTrainers").append("<option value='0'>--Select Trainer--</option>");
+            for (var index in data) {
+                $("#sTrainers").append("<option value='" + data[index].Id + "'>" + data[index].Name + "</option>");
+            }
+        }
+
+        function FillTrainersSelectForUpdate(data, trainerId) {
+            $('#sTrainers').find('option').remove().end();
+            $("#sTrainers").append("<option value='0'>--Select Trainer--</option>");
+            for (var index in data) {
+                if (data[index].Id == trainerId) {
+                    $("#sTrainers").append("<option value='" + data[index].Id + "' selected>" + data[index].Name + "</option>");
+                } else {
+                    $("#sTrainers").append("<option value='" + data[index].Id + "'>" + data[index].Name + "</option>");
+                }
+
+            }
+        }
+
+        function GetTrainers(sportId) {
+            if (sportId != null) {
+                $.ajax({
+                    method: "get",
+                    url: "/Classes/GetTrainers",
+                    data: {
+                        sportId: sportId
+                    },
+                    success: function (data) {
+                        // flag
+                        FillTrainersSelect(data);
+                    },
+                    error: function () {
+                    }
+                });
+            }
+
+        }
+
+        function GetTrainersForUpdate(sportId, trainerId) {
+            if (sportId != null) {
+                $.ajax({
+                    method: "get",
+                    url: "/Classes/GetTrainers",
+                    data: {
+                        sportId: sportId
+                    },
+                    success: function (data) {
+                        // flag
+                        FillTrainersSelectForUpdate(data, trainerId);
+                    },
+                    error: function () {
+                    }
+                });
+            }
+
+        }
+
+        function FillAllFialds(data) {
+            document.getElementById("sSports").value = data.SportId;
+            document.getElementById("sDays").value = data.Days;
+            document.getElementById("sHours").value = data.Hours;
+            if (data.StartDate !== "") {
+                document.getElementById("cbIsLimited").checked = true;
+                document.getElementById("StartDate").hidden = false;
+                document.getElementById("EndDate").hidden = false;
+                GetValidDate(document.getElementById("txtStartDate"), data.StartDate);
+                GetValidDate(document.getElementById("txtEndDate"), data.EndDate);
+                //document.getElementById("txtStartDate").value = data.StartDate;
+                //document.getElementById("txtEndDate").value = data.EndDate;
+            }
+            document.getElementById("txtMembership").value = data.Membership;
+            document.getElementById("txtHall").value = data.Hall;
+            document.getElementById("txtMax").value = data.MaxCount;
+            GetTrainersForUpdate(data.SportId, data.TrainerId);
+            document.getElementById("btnSave").value = "Update";
+        }
+
+        function SetTrainer(trainerId) {
+            debugger;
+            document.getElementById("sTrainers").value = data.TrainerId;
+        }
+
+        function GetValidDate(element, strDate) {
+            var x = strDate.indexOf(" ");
+            debugger
+            var date = strDate.substring(0, strDate.indexOf(" "));
+            var lisDate = date.split("/");
+            var day = lisDate[0];;
+            var mounth = lisDate[1];
+            if (lisDate[0].length == 1)
+                day = "0" + lisDate[0];
+            if (lisDate[1].length == 1)
+                mounth = "0" + lisDate[1];
+            var validDate = lisDate[2] + "-" + day + "-" + mounth;
+            element.value = validDate;
+        }
+
+        function SetClassTime(days) {
+
+            $('#sHours').find('option').remove();
+
+
+            $("#sHours").append("<option value='0' selected>--Select--</option>");
+            if (days != "Daily") {
+                var trainerId = document.getElementById("sTrainers").value;
+                $.ajax({
+                    method: "get",
+                    url: "/Classes/GetUnavailableTimes",
+                    data: {
+                        trainerId: trainerId,
+                        days: days
+                    },
+                    success: function (data) {
+                        var timesArr = [];
+                        timesArr = Times;
+                        for (var index in data) {
+                            for (var item in Times) {
+                                if (data[index] == Times[item]) {
+                                    timesArr.splice(item, 1);
+                                }
+                            }
+                        }
+
+                        for (var opt in timesArr) {
+                            $("#sHours").append("<option value='" + timesArr[opt] + "' selected>" + timesArr[opt] + "</option>");
+                        }
+
+                    },
+                    error: function (ex) {
+                        debugger;
+                    }
+                });
+            } else {
+                debugger;
+                for (var item in Times) {
+                    $("#sHours").append("<option value='" + Times[item] + "' selected>" + Times[item] + "</option>");
+                }
+            }
+
+        }
+
+    </script>
+    <style>
+        .row {
+            margin-bottom: 2px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        @using (Html.BeginForm("Save", "Classes", new { classId = @ViewBag.id }, FormMethod.Post))
+        {
+            <div class="form-group row">
+                <label for="sSports" class="col-sm-4 control-label">Sport Name:</label>
+                <div class="col-sm-8">
+                    <select class="form-control" id="sSports" name="sSports" onchange="GetTrainers(this.value)">
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label for="sTrainers" class="col-sm-4 control-label">Trainer Name:</label>
+                <div class="col-sm-8">
+                    <select class="form-control" id="sTrainers" name="sTrainers">
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label for="sDays" class="col-sm-4 control-label">Days:</label>
+                <div class="col-sm-8">
+                    <select class="form-control" id="sDays" name="sDays" onchange="SetClassTime(this.value)">
+                        @foreach (var item in Model.DaysTime)
+                        {
+                            <option value="@item">@item</option>
+                        }
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label for="sHours" class="col-sm-4 control-label">Hours:</label>
+                <div class="col-sm-8">
+                    <select class="form-control" id="sHours" name="sHours">
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label class="col-sm-4 control-label" for="cbIsLimited">It's Limited:</label>
+                <div class="col-sm-2">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="cbIsLimited" name="cbIsLimited" onclick="ChangeLimitation(this)">
+                    </div>
+                </div>
+            </div>
+
+            <div id="StartDate" class="form-group row" hidden>
+                <label for="txtStartDate" class="col-sm-4 control-label">Start Date:</label>
+                <div class="col-sm-8">
+                    <input type="date" id="txtStartDate" name="txtStartDate" class="form-control">
+                </div>
+            </div>
+
+            <div id="EndDate" class="form-group row" hidden>
+                <label for="txtEndDate" class="col-sm-4 control-label">End Date:</label>
+                <div class="col-sm-8">
+                    <input type="date" id="txtEndDate" name="txtEndDate" class="form-control">
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label for="txtMembership" class="col-sm-4 control-label">Membership:</label>
+                <div class="col-sm-8">
+                    <input type="text" id="txtMembership" name="txtMembership" class="form-control">
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label for="txtHall" class="col-sm-4 control-label">Hall:</label>
+                <div class="col-sm-8">
+                    <input type="text" id="txtHall" name="txtHall" class="form-control">
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label for="txtMax" class="col-sm-4 control-label">Maximum Members:</label>
+                <div class="col-sm-8">
+                    <input type="number" id="txtMax" name="txtMax" class="form-control">
+                </div>
+            </div>
+
+            <div class="button my-2">
+                <input type="submit" class="btn btn-form " id="btnSave" name="btnSave" value="Save">
+            </div>
+        }
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,105 @@
+﻿@model List<GymManagmentSystem.Models.ClassModels.ClassModel>
+@{
+    ViewBag.Title = "List";
+}
+<html>
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        .btn {
+            background-color: DodgerBlue;
+            border: none;
+            color: white;
+            padding: 2px 6px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .img {
+            background-color: rgba(152, 228, 220, 0.34)
+        }
+
+        table {
+            background: url('../../background Images/classBackground.jpg');
+            background-size: 100% 100%;
+        }
+    </style>
+    <script>
+        function Delete(Id) {
+            //debugger;
+            $.ajax({
+                type: "post",
+                url: "/Employees/Delete",
+                data: { id: Id },
+                success: function () {
+                    location.reload();
+                },
+                error: function () {
+                    alert("failed to delete");
+                }
+            });
+        }
+        function Update(Id) {
+
+            window.location.href = window.location.origin + "/Classes/update/" + Id;
+
+        }
+    </script>
+</head>
+<body style="background-color:rgba(152, 228, 220, 0.34)">
+    <div class="container mt-5">
+        <div>
+            <h2 class="text-center mb-3 text-secondary bg-light rounded-lg py-3">Classes</h2>
+        </div>
+        @if (!Model.Any())
+        {
+            <h1 style="font:italic;color:red">
+                There are no classes
+            </h1>
+        }
+        else
+        {
+            int count = 0;
+            <table class="table">
+                <thead class="thead thead-title">
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Sport</th>
+                        <th scope="col">Trainer Name</th>
+                        <th scope="col">Days</th>
+                        <th scope="col">Hours</th>
+                        <th scope="col">Hall</th>
+                        <th scope="col">Membership</th>
+                        <th scope="col">Count</th>
+                        <th scope="col">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="tbody-title">
+                    @foreach (var item in Model)
+                    {
+                        string name = item.SportName;
+                        count++;
+                        name = name.Substring(0, name.IndexOf("Trainer") - 1);
+                        <tr>
+                            <th scope="row">@count</th>
+                            <td>@name</td>
+                            <td>@item.TrainerName</td>
+                            <td>@item.Days</td>
+                            <td>@item.Hours</td>
+                            <td>@item.Hall</td>
+                            <td>@item.Membership JOD/Month</td>
+                            <td>@item.Count/@item.MaxCount</td>
+                            <td class="table-actions">
+                                <div class="actions">
+                                    <a onclick="Update(@item.Id)"><i class="fas fa-user-edit "></i></a>
+                                    <a onclick="Delete(@item.Id)"><i class="fas fa-user-times "></i></a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+</body>
+</html>

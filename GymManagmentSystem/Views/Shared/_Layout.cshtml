@@ -1,0 +1,82 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="~/Content/fontawesome-free-5.15.1-web/css/all.css" rel="stylesheet" />
+    <script src="~/Scripts/jquery-3.5.1.js"></script>
+    <script src="~/Scripts/jquery-3.5.1.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - My ASP.NET Application</title>
+    @Styles.Render("~/Content/bootstrap.min.css")
+    @Styles.Render("~/Content/style.css")
+</head>
+<body>
+    <nav class="navbar navbar-expand-md main-nav navbar-light">
+        <a class="navbar-brand" href="#">gms</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="collapsibleNavbar">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="/Home">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/Home/About">About</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/Home/Contact">Contact</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/titles">Title</a>
+                </li>
+                <!--  -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
+                        Employees
+                    </a>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" href="/Employees">Employees List</a>
+                        <a class="dropdown-item" href="/Employees/Insert">Add Employees</a>
+                    </div>
+                </li>
+                <!--  -->
+                <!--  -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
+                        Members
+                    </a>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" href="/Members">Members List</a>
+                        <a class="dropdown-item" href="/Members/Insert">Add Member</a>
+                    </div>
+                </li>
+                <!--  -->
+                <!--  -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
+                        Classes
+                    </a>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" href="/Classes">Classes</a>
+                        <a class="dropdown-item" href="/Classes/Insert">Add Clsses</a>
+                    </div>
+                </li>
+                <!--  -->
+            </ul>
+        </div>
+    </nav>
+    <div class="container body-content">
+        @RenderBody()
+        <hr />
+        <footer>
+            <p>&copy; @DateTime.Now.Year - My ASP.NET Application</p>
+        </footer>
+    </div>
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+</body>
+</html>

@@ -1,0 +1,147 @@
+﻿@model GymManagmentSystem.Models.MemberModels.MemClassModel
+@{
+    ViewBag.Title = "List";
+}
+<html>
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        .btn {
+            background-color: DodgerBlue;
+            border: none;
+            color: white;
+            padding: 2px 6px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        td {
+            padding: 3px
+        }
+    </style>
+    <script>
+        $(document).ready(function () {
+
+        });
+
+        function Delete(Id) {
+            //debugger;
+            $.ajax({
+                type: "post",
+                url: "/Members/Delete",
+                data: { id: Id },
+                success: function () {
+                    location.reload();
+                },
+                error: function () {
+                    alert("failed to delete");
+                }
+            });
+        }
+        function Update(Id) {
+            window.location.href = window.location.origin + "/Members/Update/" + Id;
+
+        }
+
+        function Enrollment(classId, memberId) {
+            $.ajax({
+                url: '/Members/Enrollment',
+                method: 'get',
+                data: {
+                    classId: classId,
+                    memberId: memberId
+                },
+                success: function (data) {
+                    debugger;
+                },
+                error: function () {
+                    debugger;
+                }
+            });
+        }
+    </script>
+</head>
+<body>
+    <div class="container-emp employees">
+        <div>
+            <h2 class="text-center mb-3 text-secondary bg-light rounded-lg py-3">Member List</h2>
+        </div>
+        @if (!Model.Mems.Any())
+        {
+            <h1 style="font:italic;color:red">
+                There are no Employees
+            </h1>
+        }
+        else
+        {
+
+            foreach (var item in Model.Mems)
+            {
+
+                var base64 = Convert.ToBase64String(item.Image);
+                var imgSrc = String.Format("data:image/png;base64,{0}", base64);
+
+                <!-- start employees card -->
+                <div class="card mb-3" style="max-width: 100%;">
+                    <div class="row no-gutters">
+                        <!-- actions -->
+                        <div class="actions col-md-1">
+                            <a onclick="Delete(@item.Id)"><i class="fas fa-user-times "></i></a> @*delete*@
+                            <a onclick="Update(@item.Id)"><i class="fas fa-user-edit "></i></a> @*edit*@
+                        </div>
+
+                        <!-- image -->
+                        <div class="col-md-1 card-img-container">
+                            <img src="@imgSrc" class="card-img" alt="...">
+                        </div>
+
+                        <!-- content -->
+                        <div class="col-md-10">
+                            <div class="card-body row">
+                                <div class="col-md-2">
+                                    <h5 class="card-title">Name</h5>
+                                    <p class="card-text text-secondary">@item.Name</p>
+                                </div>
+
+                                <div class="col-md-2">
+                                    <h5 class="card-title">Phone Number</h5>
+                                    <p class="card-text text-secondary">@item.PhoneNumber</p>
+                                </div>
+
+                                <div class="col-md-2">
+                                    <h5 class="card-title">Start Date</h5>
+                                    <p class="card-text text-secondary">@item.StartDate</p>
+                                </div>
+
+                                <div class="col-md-2">
+                                    <h5 class="card-title">Exbiry Date</h5>
+                                    <p class="card-text text-secondary">@item.ExbiryDate</p>
+                                </div>
+                                <div class="col-md-4">
+                                    <h5 class="card-title">Enrollments</h5>
+                                    <p class="card-text text-secondary">
+                                        <select class="form-control" name="ddlEnrollment" id="ddlEnrollment">
+                                            @*@foreach (var clas in Model.Classes)
+                                                {
+                                                    <option value="@clas.Id" selected>@clas.Name</option>
+                                                }*@
+                                            @foreach (var clas in item.Classes)
+                                            {
+                                                <option value="@clas.Id" selected>@clas.Name / @clas.Trainer / @clas.Trainer</option>
+                                            }
+                                        </select>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- end content -->
+                    </div>
+                </div>
+                <!--  -->
+                <!-- end employees card -->
+            }
+
+        }
+    </div>
+</body>
+</html>
